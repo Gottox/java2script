@@ -176,5 +176,15 @@ public class JavaLexerTest {
         assertNull(lexer.nextToken());
     }
 
-    // assignment 	= += -= *= /= %= &= ^= |= <<= >>= >>>=
+    @Test
+    public void testComment() {
+        JavaLexer lexer = new JavaLexer("/* a */ b // c");
+        assertEquals("/*", lexer.nextToken());
+        assertEquals("a", lexer.nextToken());
+        assertEquals("*/", lexer.nextToken());
+        assertEquals("b", lexer.nextToken());
+        assertEquals("//", lexer.nextToken());
+        assertEquals("c", lexer.nextToken());
+        assertNull(lexer.nextToken());
+    }
 }
