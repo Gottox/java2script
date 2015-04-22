@@ -123,44 +123,102 @@ public class JavaParser {
     public JavaElement parseClassBody() {
         JavaElement element = new JavaElement(JavaElement.TYPE_CLASS_BODY);
         String token;
-        while((token = this.lexer.nextToken()) != null && !"}".equals(token)) {}
+        while((token = this.lexer.nextToken()) != null && !"}".equals(token)) {
+            parseOptionDefinition();
+        }
         return element;
     }
 
     public JavaElement parseOptionDefinition() {
         JavaElement element = new JavaElement(JavaElement.TYPE_OPTION_DEFINITION);
-        JavaElement child = null;
+        JavaElement child;
         String token;
         boolean run = true;
 
         while(run && (token = this.lexer.nextToken()) != null) {
+            run = false;
             switch(token) {
             case "private":
             case "public":
             case "static":
             case "final":
+                run = true;
                 child = new JavaElement(JavaElement.TYPE_OPTION);
                 child.setValue(token);
                 break;
             case "class":
-                run = false;
                 this.lexer.back();
                 child = parseClass();
                 break;
             case "interface":
-                run = false;
                 this.lexer.back();
                 child = parseInterface();
                 break;
             case "enum":
-                run = false;
                 this.lexer.back();
                 child = parseEnum();
+                break;
+            default:
+                this.lexer.back();
+                child = parseMember();
                 break;
             }
             element.addChild(child);
         }
         return element;
+    }
+
+    public JavaElement parseMember() {
+        String token = this.lexer.nextToken();
+        JavaElement element = new JavaElement(JavaElement.TYPE_MEMBER);
+        JavaElement child;
+        element.setValue(token);
+
+        child = new JavaElement(JavaElement.TYPE_MEMBER_NAME);
+        if((token = this.lexer.nextToken()) == null) {
+            this.error = "Error";
+            return null;
+        }
+        child.setValue(token);
+        element.addChild(child);
+
+        if((token = this.lexer.nextToken()) != null && "(".equals(token)) {
+            this.lexer.back();
+            element.addChild(parseMethod());
+        }
+
+
+        return element;
+    }
+
+    public JavaElement parseMethod() {
+        JavaElement element = new JavaElement(JavaElement.TYPE_METHOD);
+        JavaElement child = new JavaElement(JavaElement.TYPE_METHOD_ARG_DEFINITION);
+        String token = this.lexer.nextToken();
+
+        if("(".equals(token) == false) {
+            this.error = "Expected '('";
+            return null;
+        }
+
+        while((token = this.lexer.nextToken()) != null && !")".equals(token)) {
+            // TODO parse args
+        }
+
+        element.addChild(child);
+
+        token = this.lexer.nextToken();
+
+        if("{".equals(token)) {
+            this.lexer.back();
+            element.addChild(this.parseCodeBlock());
+        }
+        return element;
+    }
+
+    private JavaElement parseCodeBlock() {
+        // TODO
+        return new JavaElement(JavaElement.TYPE_CODE_BLOCK);
     }
 
     public JavaElement parseEnum() {
@@ -175,7 +233,7 @@ public class JavaParser {
         String token;
         JavaElement element = new JavaElement(JavaElement.TYPE_MULTI_LINE_COMMENT);
         this.lexer.startSpan();
-        while((token = this.lexer.nextToken()) != null && "*/".equals(token) == false) { }
+        while((token = this.lexer.nextToken()) != null && !"*/".equals(token)) { }
         if(token == null)
             this.error = "Unterminated Comment";
         element.setValue(this.lexer.flushSpan());

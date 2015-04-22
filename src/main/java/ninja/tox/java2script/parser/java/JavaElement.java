@@ -38,6 +38,11 @@ public class JavaElement {
     public static final String TYPE_ENUM_BODY = "ENUM_BODY";
     public static final String TYPE_INTERFACE = "INTERFACE";
     public static final String TYPE_PACKAGE = "PACKAGE";
+    public static final String TYPE_MEMBER = "MEMBER";
+    public static final String TYPE_MEMBER_NAME = "MEMBER_NAME";
+    public static final String TYPE_METHOD = "METHOD";
+    public static final String TYPE_METHOD_ARG_DEFINITION = "METHOD_ARG_DEFINITION";
+    public static final String TYPE_CODE_BLOCK = "CODE_BLOCK";
 
     private String type;
 
