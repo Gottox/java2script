@@ -8,9 +8,9 @@ public class JavaParser {
         this.lexer = new JavaLexer(javaSource);
     }
 
-    public JavaElement parseDocument() {
+    public JavaAstElement parseDocument() {
         String token;
-        JavaElement element = new JavaElement(JavaElement.TYPE_DOCUMENT);
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_DOCUMENT);
 
         while((token = this.lexer.nextToken()) != null) {
             this.lexer.back();
@@ -25,6 +25,7 @@ public class JavaParser {
             case "public":
             case "private":
             case "class":
+            case "abstract":
             case "interface":
             case "enum":
                 element.addChild(parseOptionDefinition());
@@ -42,8 +43,8 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parsePackage() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_PACKAGE);
+    public JavaAstElement parsePackage() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_PACKAGE);
 
         if(!"package".equals(this.lexer.nextToken())) {
             error = "keyword 'package' expected";
@@ -59,12 +60,12 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseTypePath() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_TYPE_PATH);
-        JavaElement child;
+    public JavaAstElement parseTypePath() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_TYPE_PATH);
+        JavaAstElement child;
         String token;
         while((token = this.lexer.nextToken()) != null) {
-            child = new JavaElement(JavaElement.TYPE_TYPE_PATH_SEGMENT);
+            child = new JavaAstElement(JavaAstElement.TYPE_TYPE_PATH_SEGMENT);
             child.setValue(token);
             element.addChild(child);
             token = this.lexer.nextToken();
@@ -79,8 +80,8 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseImport() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_PACKAGE);
+    public JavaAstElement parseImport() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_PACKAGE);
 
         if(!"import".equals(this.lexer.nextToken())) {
             error = "keyword 'package' expected";
@@ -96,9 +97,9 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseClass() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_CLASS);
-        JavaElement child;
+    public JavaAstElement parseClass() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_CLASS);
+        JavaAstElement child;
         String token;
 
         if(!"class".equals(this.lexer.nextToken())) {
@@ -120,8 +121,8 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseClassBody() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_CLASS_BODY);
+    public JavaAstElement parseClassBody() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_CLASS_BODY);
         String token;
         while((token = this.lexer.nextToken()) != null && !"}".equals(token)) {
             parseOptionDefinition();
@@ -129,9 +130,9 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseOptionDefinition() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_OPTION_DEFINITION);
-        JavaElement child;
+    public JavaAstElement parseOptionDefinition() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_OPTION_DEFINITION);
+        JavaAstElement child;
         String token;
         boolean run = true;
 
@@ -141,9 +142,10 @@ public class JavaParser {
             case "private":
             case "public":
             case "static":
+            case "abstract":
             case "final":
                 run = true;
-                child = new JavaElement(JavaElement.TYPE_OPTION);
+                child = new JavaAstElement(JavaAstElement.TYPE_OPTION);
                 child.setValue(token);
                 break;
             case "class":
@@ -168,13 +170,13 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseMember() {
+    public JavaAstElement parseMember() {
         String token = this.lexer.nextToken();
-        JavaElement element = new JavaElement(JavaElement.TYPE_MEMBER);
-        JavaElement child;
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_MEMBER);
+        JavaAstElement child;
         element.setValue(token);
 
-        child = new JavaElement(JavaElement.TYPE_MEMBER_NAME);
+        child = new JavaAstElement(JavaAstElement.TYPE_MEMBER_NAME);
         if((token = this.lexer.nextToken()) == null) {
             this.error = "Error";
             return null;
@@ -191,9 +193,9 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseMethod() {
-        JavaElement element = new JavaElement(JavaElement.TYPE_METHOD);
-        JavaElement child = new JavaElement(JavaElement.TYPE_METHOD_ARG_DEFINITION);
+    public JavaAstElement parseMethod() {
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_METHOD);
+        JavaAstElement child = new JavaAstElement(JavaAstElement.TYPE_METHOD_ARG_DEFINITION);
         String token = this.lexer.nextToken();
 
         if("(".equals(token) == false) {
@@ -216,22 +218,22 @@ public class JavaParser {
         return element;
     }
 
-    private JavaElement parseCodeBlock() {
+    private JavaAstElement parseCodeBlock() {
         // TODO
-        return new JavaElement(JavaElement.TYPE_CODE_BLOCK);
+        return new JavaAstElement(JavaAstElement.TYPE_CODE_BLOCK);
     }
 
-    public JavaElement parseEnum() {
-        return new JavaElement(JavaElement.TYPE_ENUM);
+    public JavaAstElement parseEnum() {
+        return new JavaAstElement(JavaAstElement.TYPE_ENUM);
     }
 
-    public JavaElement parseInterface() {
-        return new JavaElement(JavaElement.TYPE_INTERFACE);
+    public JavaAstElement parseInterface() {
+        return new JavaAstElement(JavaAstElement.TYPE_INTERFACE);
     }
 
-    public JavaElement parseMultiLineComment() {
+    public JavaAstElement parseMultiLineComment() {
         String token;
-        JavaElement element = new JavaElement(JavaElement.TYPE_MULTI_LINE_COMMENT);
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_MULTI_LINE_COMMENT);
         this.lexer.startSpan();
         while((token = this.lexer.nextToken()) != null && !"*/".equals(token)) { }
         if(token == null)
@@ -241,9 +243,9 @@ public class JavaParser {
         return element;
     }
 
-    public JavaElement parseComment() {
+    public JavaAstElement parseComment() {
         char ws;
-        JavaElement element = new JavaElement(JavaElement.TYPE_COMMENT);
+        JavaAstElement element = new JavaAstElement(JavaAstElement.TYPE_COMMENT);
         this.lexer.startSpan();
         while((ws = this.lexer.nextWhiteSpace()) != '\n' && ws != '\0') { }
 

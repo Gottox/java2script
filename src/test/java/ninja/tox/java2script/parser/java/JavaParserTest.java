@@ -19,12 +19,21 @@ public class JavaParserTest {
     }
 
     @Test
-    public void testEmptyMethod() {
+    public void testUndefinedMember() {
         JavaParser parser = new JavaParser(
-                "void testMethod() {\n" +
-                "}\n");
+                "int testMember;\n");
         assertEquals(
                 "MEMBER: void\n" +
+                " MEMBER_NAME: testMember\n", parser.parseMember().toString());
+    }
+
+    @Test
+    public void testEmptyMethod() {
+        JavaParser parser = new JavaParser(
+                "int testMethod() {\n" +
+                "}\n");
+        assertEquals(
+                "MEMBER: int\n" +
                 " MEMBER_NAME: testMethod\n" +
                 " METHOD: null\n" +
                 "  METHOD_ARG_DEFINITION: null\n" +
@@ -37,8 +46,8 @@ public class JavaParserTest {
                 "void testMethod();\n");
         assertEquals(
                 "MEMBER: void\n" +
-                        " MEMBER_NAME: testMethod\n" +
-                        " METHOD: null\n" +
-                        "  METHOD_ARG_DEFINITION: null\n", parser.parseMember().toString());
+                " MEMBER_NAME: testMethod\n" +
+                " METHOD: null\n" +
+                "  METHOD_ARG_DEFINITION: null\n", parser.parseMember().toString());
     }
 }

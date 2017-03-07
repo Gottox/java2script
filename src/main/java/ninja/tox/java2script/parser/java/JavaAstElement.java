@@ -1,6 +1,6 @@
 package ninja.tox.java2script.parser.java;
 
-public class JavaElement {
+public class JavaAstElement {
     /**
      * Definition of a document. That's just the .java file itself
      */
@@ -43,10 +43,11 @@ public class JavaElement {
     public static final String TYPE_METHOD = "METHOD";
     public static final String TYPE_METHOD_ARG_DEFINITION = "METHOD_ARG_DEFINITION";
     public static final String TYPE_CODE_BLOCK = "CODE_BLOCK";
+    public static final String TYPE_ASSIGNMENT = "ASSIGNMENT";
 
     private String type;
 
-    private JavaElement[] children = new JavaElement[0];
+    private JavaAstElement[] children = new JavaAstElement[0];
 
     private String value = null;
 
@@ -58,9 +59,9 @@ public class JavaElement {
         this.type = type;
     }
 
-    public void addChild(JavaElement e) {
+    public void addChild(JavaAstElement e) {
         int i = 0;
-        JavaElement[] newChildren = new JavaElement[this.children.length+1];
+        JavaAstElement[] newChildren = new JavaAstElement[this.children.length+1];
 
         if(e == null)
             return;
@@ -71,9 +72,9 @@ public class JavaElement {
         this.children[i] = e;
     }
 
-    public JavaElement[] getChild(String type) {
+    public JavaAstElement[] getChild(String type) {
         int i = 0, j = 0;
-        JavaElement[] result = new JavaElement[this.children.length];
+        JavaAstElement[] result = new JavaAstElement[this.children.length];
 
         while(i < children.length) {
             if(type == null || children[i].getType().equals(type)) {
@@ -84,7 +85,7 @@ public class JavaElement {
         return children;
     }
 
-    public JavaElement(String type) {
+    public JavaAstElement(String type) {
         this.type = type;
     }
 
